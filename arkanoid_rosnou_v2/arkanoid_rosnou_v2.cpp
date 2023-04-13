@@ -1,5 +1,4 @@
 ﻿#include <iostream>
-#include <vector>
 #include <string>
 #include <windows.h>
 
@@ -34,6 +33,7 @@ int hitCount = 0;
 int maxHitCount = 0;
 int lvl = 1;
 bool run = false;
+string hp = "\3\3\3";
 
 void moveBall(float x, float y);
 void setCursor(short x, short y);
@@ -45,7 +45,7 @@ void initBall() {
 }
 
 void putBall() {
-    mas[ball.iy][ball.ix] = 'o';
+    mas[ball.iy][ball.ix] = '\1';
 }
 
 void moveBall(float x, float y) {
@@ -67,7 +67,20 @@ void autoMoveBall() {
 
     moveBall(ball.x + cos(ball.alfa) * ball.speed, ball.y + sin(ball.alfa) * ball.speed);
 
-    if ((mas[ball.iy][ball.ix] == '#') || (mas[ball.iy][ball.ix] == '"') || (mas[ball.iy][ball.ix] == BRICK)) {
+    switch (mas[ball.iy][ball.ix]) {
+    case '3':
+        lvlMap[ball.iy][ball.ix] = '2';
+        break;
+    case '2':
+        lvlMap[ball.iy][ball.ix] = '1';
+        break;
+    case '1':
+        lvlMap[ball.iy][ball.ix] = ' ';
+        break;
+    }
+
+    if ((mas[ball.iy][ball.ix] == '#') || (mas[ball.iy][ball.ix] == '"') || (mas[ball.iy][ball.ix] == BRICK) || ((mas[ball.iy][ball.ix] == '1')
+        || (mas[ball.iy][ball.ix] == '2') || (mas[ball.iy][ball.ix] == '3'))) {
         if (mas[ball.iy][ball.ix] == '"') {
             hitCount++;
         }
@@ -123,9 +136,20 @@ void putRacket() {
 // инициализация карты
 void lvlMapPuzzile() {
     if (lvl == 1) {
-        for (int i = 7; i < WIDTH - 7; i++) {
-            lvlMap[5][i] = lvlMap[6][i] = BRICK;
-        }   
+        int step = 0;
+        for (int i = 4; i < WIDTH - 4; i++) {
+            step++;
+            if ((step == 4) || (step == 5) || (step == 6)) {
+                if (step == 6) {
+                    step = 0;
+                }
+                continue;
+            }
+            lvlMap[5][i] = lvlMap[7][i] = lvlMap[9][i] = lvlMap[11][i] = lvlMap[13][i] = lvlMap[15][i] = BRICK;
+        }
+        for (int i = 1; i < WIDTH - 3; i = i + 2) {
+            lvlMap[17][i] = '3';
+        }
     }
     if (lvl == 2) {
         for (int i = 19; i <= 48; i++) {
@@ -178,6 +202,9 @@ void show() {
         if (i == 4) {
             cout << "   max " << maxHitCount;
         }
+        if (i == 5) {
+            cout << "   hp " << hp;
+        }
         if (i < HEIGHT) {
             cout << endl;
         }
@@ -218,6 +245,11 @@ void showPreview() {
 void checkFaild() {
     if (ball.y >= HEIGHT - 1) {
         run = false;
+        hp.pop_back();
+        if (hp == "") {
+            lvlMapInit(lvl);
+            hp = "\3\3\3";
+        }
         if (hitCount > maxHitCount) {
             maxHitCount = hitCount;
         }
@@ -241,6 +273,7 @@ int lvlMapBrickCount() {
 void checkWin() {
     if (lvlMapBrickCount() == 0) {
         lvl++;
+        hp = "\3\3\3";
         if (lvl > 3) {
             lvl = 1;
         }

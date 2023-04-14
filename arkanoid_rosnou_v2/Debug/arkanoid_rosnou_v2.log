@@ -1,11 +1,13 @@
 ﻿  arkanoid_rosnou_v2.cpp
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(60,28): warning C4305: +=: усечение из "double" в "float"
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(63,28): warning C4305: -=: усечение из "double" в "float"
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(100,35): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(104,50): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(107,39): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(112,42): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(115,31): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(294,62): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(294,27): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(64,30): warning C4305: +=: усечение из "double" в "float"
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(68,30): warning C4305: -=: усечение из "double" в "float"
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(106,38): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(108,31): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(113,35): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(118,52): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(121,41): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(126,44): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(129,33): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(409,62): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(409,27): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
   arkanoid_rosnou_v2.vcxproj -> G:\cpp-projects\arkanoid_rosnou_v2\Debug\arkanoid_rosnou_v2.exe

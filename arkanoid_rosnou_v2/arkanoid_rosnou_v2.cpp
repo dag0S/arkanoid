@@ -1,10 +1,13 @@
-﻿#include <iostream>
+﻿#define _USE_MATH_DEFINES
+
+#include <iostream>
 #include <string>
 #include <windows.h>
+#include <cassert> 
+#include <math.h> 
 
 #define WIDTH 60
 #define HEIGHT 30
-#define Pi 3.14
 
 #define BRICK (char)176
 #define BRICK_WIDTH 3
@@ -33,6 +36,7 @@ int hitCount = 0;
 int maxHitCount = 0;
 int lvl = 1;
 bool run = false;
+bool skip = false;
 string hp = "\3\3\3";
 
 void moveBall(float x, float y);
@@ -57,10 +61,11 @@ void moveBall(float x, float y) {
 
 void autoMoveBall() {
     if (ball.alfa < 0) {
-        ball.alfa += Pi * 2;
+        ball.alfa += M_PI * 2;
     }
-    if (ball.alfa > Pi * 2) {
-        ball.alfa -= Pi * 2;
+
+    if (ball.alfa > M_PI * 2) {
+        ball.alfa -= M_PI * 2;
     }
 
     TBall b1 = ball;
@@ -81,9 +86,7 @@ void autoMoveBall() {
 
     if ((mas[ball.iy][ball.ix] == '#') || (mas[ball.iy][ball.ix] == '"') || (mas[ball.iy][ball.ix] == BRICK) || ((mas[ball.iy][ball.ix] == '1')
         || (mas[ball.iy][ball.ix] == '2') || (mas[ball.iy][ball.ix] == '3'))) {
-        if (mas[ball.iy][ball.ix] == '"') {
-            hitCount++;
-        }
+        
         if (mas[ball.iy][ball.ix] == BRICK) {
             int brickNom = (ball.ix - 1) / BRICK_WIDTH;
             int dx = 1 + brickNom * BRICK_WIDTH;
@@ -95,24 +98,35 @@ void autoMoveBall() {
                 }
             }
         }
-        if ((ball.ix != b1.ix) && (ball.iy != b1.iy)) {
+
+        if (mas[ball.iy][ball.ix] == '"') {
+            hitCount++;
+            float pos = ball.x - racket.x;
+            float psi = pos / racket.widthRacket * 2;
+            psi = (psi - 1) * M_PI_2 * 0.9;
+            assert((psi < M_PI_2) && (psi > -M_PI_2));
+            b1.alfa = -M_PI_2 + psi;
+        }
+        else if ((ball.ix != b1.ix) && (ball.iy != b1.iy)) {
+
             if (mas[b1.iy][ball.ix] == mas[ball.iy][b1.ix]) {
-                b1.alfa = b1.alfa + Pi;
+                b1.alfa = b1.alfa + M_PI;
             }
             else {
+
                 if (mas[b1.iy][ball.ix] == '#') {
-                    b1.alfa = (2 * Pi - b1.alfa) + Pi;
+                    b1.alfa = (2 * M_PI - b1.alfa) + M_PI;
                 }
                 else {
-                    b1.alfa = (2 * Pi - b1.alfa);
+                    b1.alfa = (2 * M_PI - b1.alfa);
                 }
             }
         }
         else if (ball.iy == b1.iy) {
-            b1.alfa = (2 * Pi - b1.alfa) + Pi;
+            b1.alfa = (2 * M_PI - b1.alfa) + M_PI;
         } 
         else {
-            b1.alfa = (2 * Pi - b1.alfa);
+            b1.alfa = (2 * M_PI - b1.alfa);
         }
 
         ball = b1;
@@ -133,9 +147,16 @@ void putRacket() {
     }
 }
 
+void drawBrick(int x, int y) {
+    for (int i = 0; i < 3; i++) {
+        lvlMap[x][y + i] = BRICK;
+    }
+}
+
 // инициализация карты
 void lvlMapPuzzile() {
     if (lvl == 1) {
+       /*
         int step = 0;
         for (int i = 4; i < WIDTH - 4; i++) {
             step++;
@@ -150,7 +171,60 @@ void lvlMapPuzzile() {
         for (int i = 1; i < WIDTH - 3; i = i + 2) {
             lvlMap[17][i] = '3';
         }
+        */
+        
+        // Р
+        for (int i = 3; i <= 8; i++)
+            drawBrick(i, 1);
+        for (int i = 3; i <= 6; i++)
+            drawBrick(i, 7);
+        drawBrick(3, 4);
+        drawBrick(6, 4);
+
+        // О
+        for (int i = 3; i <= 8; i++)
+            drawBrick(i, 13);
+        drawBrick(3, 16);
+        drawBrick(8, 16);
+        for (int i = 3; i <= 8; i++)
+            drawBrick(i, 19);
+
+        // С 
+        for (int i = 3; i <= 8; i++)
+            drawBrick(i, 25);
+        drawBrick(3, 28);
+        drawBrick(8, 28);
+        drawBrick(3, 31);
+        drawBrick(4, 31);
+        drawBrick(7, 31);
+        drawBrick(8, 31);
+
+        // Н
+        for (int i = 11; i <= 16; i++)
+            drawBrick(i, 25);
+        for (int i = 11; i <= 16; i++)
+            drawBrick(i, 31);
+        drawBrick(13, 28);
+        drawBrick(14, 28);
+
+        // О
+        for (int i = 11; i <= 16; i++)
+            drawBrick(i, 37);
+        drawBrick(11, 40);
+        drawBrick(16, 40);
+        for (int i = 11; i <= 16; i++)
+            drawBrick(i, 43);
+
+        // У
+        for (int i = 11; i <= 14; i++)
+            drawBrick(i, 49);
+        for (int i = 11; i <= 16; i++)
+            drawBrick(i, 55);
+        drawBrick(16, 49);
+        drawBrick(16, 52);
+        drawBrick(14, 52);
     }
+
     if (lvl == 2) {
         for (int i = 19; i <= 48; i++) {
             lvlMap[1][i] = lvlMap[2][i] = BRICK;
@@ -183,6 +257,7 @@ void lvlMapInit(int lvl) {
 
 void lvlMapPut() {
     memset(mas, 0, sizeof(mas));
+
     for (int j = 0; j < HEIGHT; j++) {
         memcpy(mas[j], lvlMap[j], sizeof(**lvlMap) * WIDTH);
     }
@@ -191,20 +266,56 @@ void lvlMapPut() {
 // показ карты
 void show() {
     setCursor(0, 0);
+
+    cout << endl;
+    cout << "+--------------+----------------------+--------------------+" << endl;
+    cout << "|    hp " << hp;
+
+    if (hp.length() == 3)
+        cout << "";
+    else if (hp.length() == 2)
+        cout << " ";
+    else
+        cout << "  ";
+
+    cout << "    |         lvl " << lvl << "        |   hit " << hitCount;
+
+    if (hitCount < 10)
+        cout << "  ";
+    else if ((hitCount >= 10) && (hitCount < 100))
+        cout << " ";
+    else
+        cout << "";
+
+    cout << " max " << maxHitCount;
+
+    if (maxHitCount < 10)
+        cout << "  ";
+    else if ((maxHitCount >= 10) && (hitCount < 100))
+        cout << " ";
+    else
+        cout << "";
+    cout << "  |" << endl << "+--------------+----------------------+--------------------+" << endl << endl;
+
     for (int i = 0; i < HEIGHT; i++) {
         cout << mas[i];
+        
         if (i == 2) {
-            cout << "   lvl " << lvl;
+            cout << "\t\tControl ";
         }
         if (i == 3) {
-            cout << "   hit " << hitCount;
+            cout << "\tW - running the ball";
         }
         if (i == 4) {
-            cout << "   max " << maxHitCount;
+            cout << "\tA - movement to the left";
         }
         if (i == 5) {
-            cout << "   hp " << hp;
+            cout << "\tD - movement to the right";
         }
+        if (i == 6) {
+            cout << "\tK - skip level";
+        }
+        
         if (i < HEIGHT) {
             cout << endl;
         }
@@ -214,9 +325,11 @@ void show() {
 // движение ракетки, x задает левый угол ракетки
 void moveRacket(int x) {
     racket.x = x;
+
     if (racket.x < 1) {
         racket.x = 1;
     }
+
     if (racket.x + racket.widthRacket >= WIDTH) {
         racket.x = WIDTH - 1 - racket.widthRacket;
     }
@@ -246,12 +359,13 @@ void checkFaild() {
     if (ball.y >= HEIGHT - 1) {
         run = false;
         hp.pop_back();
+        if (hitCount > maxHitCount) {
+            maxHitCount = hitCount;
+        }
         if (hp == "") {
             lvlMapInit(lvl);
             hp = "\3\3\3";
-        }
-        if (hitCount > maxHitCount) {
-            maxHitCount = hitCount;
+            maxHitCount = 0;
         }
         hitCount = 0;
         system("cls");
@@ -271,7 +385,7 @@ int lvlMapBrickCount() {
 }
 
 void checkWin() {
-    if (lvlMapBrickCount() == 0) {
+    if ((lvlMapBrickCount() == 0) || skip) {
         lvl++;
         hp = "\3\3\3";
         if (lvl > 3) {
@@ -279,6 +393,7 @@ void checkWin() {
         }
         lvlMapInit(lvl);
         run = false;
+        skip = false;
         maxHitCount = 0;
         hitCount = 0;
         system("cls");
@@ -297,7 +412,7 @@ void ballWork() {
 
 int main()
 {
-    system("mode con cols=70 lines=31");
+    system("mode con cols=90 lines=36");
 
     initRacket();
 
@@ -332,6 +447,12 @@ int main()
 
         if (GetKeyState('W') < 0) {
             run = true;
+        }
+
+        if (GetKeyState('K') < 0) {
+            Sleep(100);
+            skip = true;
+            checkWin();
         }
       
         Sleep(10);

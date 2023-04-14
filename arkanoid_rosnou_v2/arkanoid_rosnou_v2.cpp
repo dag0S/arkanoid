@@ -226,11 +226,53 @@ void lvlMapPuzzile() {
     }
 
     if (lvl == 2) {
-        for (int i = 19; i <= 48; i++) {
-            lvlMap[1][i] = lvlMap[2][i] = BRICK;
-            lvlMap[8][i] = lvlMap[9][i] = BRICK;
-            lvlMap[10][i] = '#';
+        for (int i = 9; i <= 49; i++)
+            lvlMap[15][i] = '3';
+        for (int i = 1; i <= 14; i++) {
+            lvlMap[i][9] = '3';
+            lvlMap[i][49] = '3';
         }
+        for (int i = 1; i <= 5; i++) {
+            drawBrick(i, 10);
+            drawBrick(i + 9, 10);
+            drawBrick(i, 46);
+            drawBrick(i + 9, 46);
+        }
+        for (int i = 1; i <= 4; i++) {
+            drawBrick(i, 13);
+            drawBrick(i + 10, 13);
+            drawBrick(i, 43);
+            drawBrick(i + 10, 43);
+        }
+        for (int i = 1; i <= 3; i++) {
+            drawBrick(i, 16);
+            drawBrick(i +11, 16);
+            drawBrick(i, 40);
+            drawBrick(i + 11, 40);
+        }
+        for (int i = 1; i <= 2; i++) {
+            drawBrick(i, 19);
+            drawBrick(i + 12, 19);
+            drawBrick(i, 37);
+            drawBrick(i + 12, 37);
+        }
+
+        drawBrick(1, 22);
+        drawBrick(14, 22);
+        drawBrick(1, 34);
+        drawBrick(14, 34);
+            
+        for (int i = 6; i <= 9; i++)
+            drawBrick(i, 28);
+        for (int i = 5; i <= 10; i++) {
+            lvlMap[i][27] = '1';
+            lvlMap[i][31] = '1';
+        }
+        for (int i = 28; i <= 30; i++) {
+            lvlMap[5][i] = '1';
+            lvlMap[10][i] = '1';
+        }
+            
     }
 
     if (lvl == 3) {

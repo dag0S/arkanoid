@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <cassert> 
 #include <math.h> 
+#include <ctime> 
 
 #define WIDTH 60
 #define HEIGHT 30
@@ -18,17 +19,21 @@ char mas[HEIGHT][WIDTH + 1];
 char lvlMap[HEIGHT][WIDTH];
 
 // Ракетка
-typedef struct {
+struct TRacket {
     int x, y;
     int widthRacket;
-} TRacket;
+    int fireMode;
+} ;
 
+// Шарик
 typedef struct {
     float x, y;
     int ix, iy;
     float alfa;
     float speed;
-} TBall;
+    char type;
+    char del;
+} TBall, TObj;
 
 TRacket racket;
 TBall ball;
@@ -39,8 +44,117 @@ bool run = false;
 bool skip = false;
 string hp = "\3\3\3";
 
+// Максимально возможное кол-во объектов
+#define OBJ_ARR_SIZE 1000
+TObj objArr[OBJ_ARR_SIZE];
+int objArrCnt = 0;
+
+#define WIDE 'W'
+#define THIN 'T'
+#define FIRE 'F'
+#define BULLET '.'
+#define OBJ_UPGRADE_TYPES_RAND_MAX 18
+char objUpgradeTypes[] = { WIDE, THIN, FIRE };
+int objUpgradeTypesCnt = sizeof(objUpgradeTypes) / sizeof(objUpgradeTypes[0]);
+
 void moveBall(float x, float y);
 void setCursor(short x, short y);
+char objHitBrick(TObj ball);
+
+// Создаем объект
+TObj objCreate(float x, float y, float a, float spd, char chr) {
+    return {x, y, (int)x, (int)y, a, spd, chr};
+}
+
+// Кладем объект на карту
+void objPut(TObj obj) {
+    if (mas[obj.iy][obj.ix] == ' ')
+        mas[obj.iy][obj.ix] = obj.type;
+}
+
+// Коректировка угла движения
+void correctAngle(float* a) {
+    if (*a < 0)
+        *a += M_PI * 2;
+    if (*a > M_PI * 2)
+        *a -= M_PI * 2;
+}
+
+// Перемещение объекта
+void objMove(TObj *obj) {
+    correctAngle(&obj->alfa);
+    obj->x += cos(obj->alfa) * obj->speed;
+    obj->y += sin(obj->alfa) * obj->speed;
+    obj->ix = (int)obj->x;
+    obj->iy = (int)obj->y;
+}
+
+void objWorkUpgrade(TObj* obj) {
+    if (mas[obj->iy][obj->ix] != '"')
+        return;
+    if (obj->type == WIDE)
+        racket.widthRacket = min(racket.widthRacket + 1, 15), obj->del = 1;
+    if (obj->type == THIN)
+        racket.widthRacket = max(racket.widthRacket - 1, 5), obj->del = 1;
+    if (obj->type == FIRE) {
+        if (racket.fireMode < 1)
+            racket.fireMode = 1;
+        obj->del = 1;
+    }
+}
+
+// Обработчик пуль
+void objWorkBullet(TObj* obj) {
+    if (obj->type != BULLET)
+        return;
+    if (objHitBrick(*obj) || mas[obj->iy][obj->ix] == '#')
+        obj->del = 1;
+}
+
+// Ф-ция работы объкта
+void objWork(TObj* obj) {
+    objMove(obj);
+    objWorkUpgrade(obj);
+    objWorkBullet(obj);
+}
+
+// Добавляет объект в массив
+void objArrAdd(TObj obj) {
+    assert(objArrCnt + 1 < OBJ_ARR_SIZE);
+    objArr[objArrCnt] = obj;
+    objArrCnt++;
+}
+
+// Удаляет объкт из массива
+void objArrDelPos(int pos) {
+    if (pos < 0 || pos >= objArrCnt)
+        return;
+    objArr[pos] = objArr[objArrCnt - 1];
+    objArrCnt--;
+}
+
+// Обрабатывает все объекты в массиве
+void objArrWork() {
+    int i = 0;
+    while (i < objArrCnt) {
+        objWork(objArr + i);
+        if (objArr[i].y < 0 || objArr[i].y > HEIGHT || objArr[i].del)
+            objArrDelPos(i);
+        else
+            i++;
+    }
+}
+
+// Кладет на карту все объекты
+void objArrPut() {
+    for (int i = 0; i < objArrCnt; i++)
+        objPut(objArr[i]);
+}
+
+// Очистка массива с объектами
+void objArrClear() {
+    objArrCnt = 0;
+}
 
 void initBall() {
     moveBall(2, 2);
@@ -57,6 +171,32 @@ void moveBall(float x, float y) {
     ball.y = y;
     ball.ix = (int)round(ball.x);
     ball.iy = (int)round(ball.y);
+}
+
+// Генерация случайного числа
+void objChanceCreateRandomUpgradeObj(float x, float y) {
+    int i = rand() % OBJ_UPGRADE_TYPES_RAND_MAX;
+    if (i < objUpgradeTypesCnt)
+        objArrAdd(objCreate(x, y, M_PI_2, 0.2, objUpgradeTypes[i]));
+}
+
+// Разрушение кирпичика
+char objHitBrick(TObj ball) {
+    if (mas[ball.iy][ball.ix] == BRICK) {
+        if (lvlMap[ball.iy][ball.ix] == BRICK)
+            objChanceCreateRandomUpgradeObj(ball.x, ball.y);
+        int brickNom = (ball.ix - 1) / BRICK_WIDTH;
+        int dx = 1 + brickNom * BRICK_WIDTH;
+        for (int i = 0; i < BRICK_WIDTH; i++) {
+            static char* c;
+            c = &lvlMap[ball.iy][i + dx];
+            if (*c == BRICK) {
+                *c = ' ';
+            }
+        }
+        return 1;
+    }
+    return 0;
 }
 
 void autoMoveBall() {
@@ -87,17 +227,7 @@ void autoMoveBall() {
     if ((mas[ball.iy][ball.ix] == '#') || (mas[ball.iy][ball.ix] == '"') || (mas[ball.iy][ball.ix] == BRICK) || ((mas[ball.iy][ball.ix] == '1')
         || (mas[ball.iy][ball.ix] == '2') || (mas[ball.iy][ball.ix] == '3'))) {
         
-        if (mas[ball.iy][ball.ix] == BRICK) {
-            int brickNom = (ball.ix - 1) / BRICK_WIDTH;
-            int dx = 1 + brickNom * BRICK_WIDTH;
-            for (int i = 0; i < BRICK_WIDTH; i++) {
-                static char* c;
-                c = &lvlMap[ball.iy][i + dx];
-                if (*c == BRICK) {
-                    *c = ' ';
-                }
-            }
-        }
+        objHitBrick(ball);
 
         if (mas[ball.iy][ball.ix] == '"') {
             hitCount++;
@@ -138,13 +268,16 @@ void initRacket() {
     racket.widthRacket = 7;
     racket.x = (WIDTH - racket.widthRacket) / 2;
     racket.y = HEIGHT - 1;
+    racket.fireMode = 0;
 }
 
-// показ ракетки
+// помещение ракетки в локацию
 void putRacket() {
     for (int i = racket.x; i < racket.x + racket.widthRacket; i++) {
         mas[racket.y][i] = '"';
     }
+    if (racket.fireMode > 0)
+        mas[racket.y - 1][racket.x + racket.widthRacket / 2] = '|';
 }
 
 void drawBrick(int x, int y) {
@@ -156,23 +289,6 @@ void drawBrick(int x, int y) {
 // инициализация карты
 void lvlMapPuzzile() {
     if (lvl == 1) {
-       /*
-        int step = 0;
-        for (int i = 4; i < WIDTH - 4; i++) {
-            step++;
-            if ((step == 4) || (step == 5) || (step == 6)) {
-                if (step == 6) {
-                    step = 0;
-                }
-                continue;
-            }
-            lvlMap[5][i] = lvlMap[7][i] = lvlMap[9][i] = lvlMap[11][i] = lvlMap[13][i] = lvlMap[15][i] = BRICK;
-        }
-        for (int i = 1; i < WIDTH - 3; i = i + 2) {
-            lvlMap[17][i] = '3';
-        }
-        */
-        
         // Р
         for (int i = 3; i <= 8; i++)
             drawBrick(i, 1);
@@ -377,6 +493,7 @@ void moveRacket(int x) {
     }
 }
 
+// переводит курсор в верхний левый угол
 void setCursor(short x, short y) {
     COORD coord;
     coord.X = x;
@@ -408,6 +525,8 @@ void checkFaild() {
             lvlMapInit(lvl);
             hp = "\3\3\3";
             maxHitCount = 0;
+            initRacket();
+            objArrClear();
         }
         hitCount = 0;
         system("cls");
@@ -438,6 +557,8 @@ void checkWin() {
         skip = false;
         maxHitCount = 0;
         hitCount = 0;
+        initRacket();
+        objArrClear();
         system("cls");
         showPreview();
     }
@@ -450,6 +571,37 @@ void ballWork() {
     else {
         moveBall(racket.x + racket.widthRacket / 2, racket.y - 1);
     }
+}
+
+// Стреляба с ракетки
+void racketShout() {
+    if (racket.fireMode != 1)
+        return;
+    objArrAdd(objCreate(racket.x + racket.widthRacket / 2, racket.y - 2, -M_PI_2, 0.5, BULLET));
+    racket.fireMode += 10;
+}
+
+int flag = 0; // костыли
+time_t start = 0;
+
+// Засекает 10 сек после чего отключает fire mode
+void timerFireMod() {
+    flag++;
+    if (flag == 1)
+        start = time(NULL);
+    if ((time(NULL) - start) < 8)
+        return;
+    else {
+        start = 0;
+        flag = 0;
+    }
+    racket.fireMode = 0;
+}
+
+void racketWork() {
+    if (racket.fireMode > 1)
+        racket.fireMode--;
+    timerFireMod();
 }
 
 int main()
@@ -467,6 +619,10 @@ int main()
     do {
         ballWork();
 
+        objArrWork();
+
+        racketWork();
+
         checkFaild();
 
         checkWin();
@@ -476,6 +632,8 @@ int main()
         putRacket();
 
         putBall();
+
+        objArrPut();
 
         show(); // вызов show
 
@@ -489,6 +647,10 @@ int main()
 
         if (GetKeyState('W') < 0) {
             run = true;
+        }
+
+        if (GetKeyState(VK_SPACE) < 0) {
+            racketShout();
         }
 
         if (GetKeyState('K') < 0) {

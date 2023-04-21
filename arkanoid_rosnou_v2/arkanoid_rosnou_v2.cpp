@@ -23,7 +23,7 @@ struct TRacket {
     int x, y;
     int widthRacket;
     int fireMode;
-} ;
+};
 
 // Шарик
 typedef struct {
@@ -39,7 +39,7 @@ TRacket racket;
 TBall ball;
 int hitCount = 0;
 int maxHitCount = 0;
-int lvl = 1;
+int lvl = 4;
 bool run = false;
 bool skip = false;
 string hp = "\3\3\3";
@@ -60,6 +60,9 @@ int objUpgradeTypesCnt = sizeof(objUpgradeTypes) / sizeof(objUpgradeTypes[0]);
 void moveBall(float x, float y);
 void setCursor(short x, short y);
 char objHitBrick(TObj ball);
+void showMenu();
+char objHitDigit(TObj ball);
+bool checkFaild();
 
 // Создаем объект
 TObj objCreate(float x, float y, float a, float spd, char chr) {
@@ -107,7 +110,7 @@ void objWorkUpgrade(TObj* obj) {
 void objWorkBullet(TObj* obj) {
     if (obj->type != BULLET)
         return;
-    if (objHitBrick(*obj) || mas[obj->iy][obj->ix] == '#')
+    if ((objHitBrick(*obj)) || (objHitDigit(*obj)) || (mas[obj->iy][obj->ix] == '#'))
         obj->del = 1;
 }
 
@@ -134,11 +137,11 @@ void objArrDelPos(int pos) {
 }
 
 // Обрабатывает все объекты в массиве
-void objArrWork() {
+void objArrWork(bool ballFaild) {
     int i = 0;
     while (i < objArrCnt) {
         objWork(objArr + i);
-        if (objArr[i].y < 0 || objArr[i].y > HEIGHT || objArr[i].del)
+        if (objArr[i].y < 0 || objArr[i].y > HEIGHT || objArr[i].del || ballFaild)
             objArrDelPos(i);
         else
             i++;
@@ -199,6 +202,22 @@ char objHitBrick(TObj ball) {
     return 0;
 }
 
+// Разрушение цифр
+char objHitDigit(TObj ball) {
+    switch (mas[ball.iy][ball.ix]) {
+    case '3':
+        lvlMap[ball.iy][ball.ix] = '2';
+        return 1;
+    case '2':
+        lvlMap[ball.iy][ball.ix] = '1';
+        return 1;
+    case '1':
+        lvlMap[ball.iy][ball.ix] = ' ';
+        return 1;
+    }
+    return 0;
+}
+
 void autoMoveBall() {
     if (ball.alfa < 0) {
         ball.alfa += M_PI * 2;
@@ -212,17 +231,7 @@ void autoMoveBall() {
 
     moveBall(ball.x + cos(ball.alfa) * ball.speed, ball.y + sin(ball.alfa) * ball.speed);
 
-    switch (mas[ball.iy][ball.ix]) {
-    case '3':
-        lvlMap[ball.iy][ball.ix] = '2';
-        break;
-    case '2':
-        lvlMap[ball.iy][ball.ix] = '1';
-        break;
-    case '1':
-        lvlMap[ball.iy][ball.ix] = ' ';
-        break;
-    }
+    objHitDigit(ball);
 
     if ((mas[ball.iy][ball.ix] == '#') || (mas[ball.iy][ball.ix] == '"') || (mas[ball.iy][ball.ix] == BRICK) || ((mas[ball.iy][ball.ix] == '1')
         || (mas[ball.iy][ball.ix] == '2') || (mas[ball.iy][ball.ix] == '3'))) {
@@ -271,13 +280,32 @@ void initRacket() {
     racket.fireMode = 0;
 }
 
+int flag = 0; // костыли
+time_t start = 0;
+
+// Засекает 10 сек после чего отключает fire mode
+void timerFireMod() {
+    flag++;
+    if (flag == 1)
+        start = time(NULL);
+    if ((time(NULL) - start) < 5)
+        return;
+    else {
+        start = 0;
+        flag = 0;
+    }
+    racket.fireMode = 0;
+}
+
 // помещение ракетки в локацию
 void putRacket() {
     for (int i = racket.x; i < racket.x + racket.widthRacket; i++) {
         mas[racket.y][i] = '"';
     }
-    if (racket.fireMode > 0)
+    if (racket.fireMode > 0) {
         mas[racket.y - 1][racket.x + racket.widthRacket / 2] = '|';
+        timerFireMod();
+    }
 }
 
 void drawBrick(int x, int y) {
@@ -372,12 +400,10 @@ void lvlMapPuzzile() {
             drawBrick(i, 37);
             drawBrick(i + 12, 37);
         }
-
         drawBrick(1, 22);
         drawBrick(14, 22);
         drawBrick(1, 34);
         drawBrick(14, 34);
-            
         for (int i = 6; i <= 9; i++)
             drawBrick(i, 28);
         for (int i = 5; i <= 10; i++) {
@@ -388,16 +414,77 @@ void lvlMapPuzzile() {
             lvlMap[5][i] = '1';
             lvlMap[10][i] = '1';
         }
-            
     }
 
     if (lvl == 3) {
-        for (int j = 1; j < 10; j++) {
-            for (int i = 1; i < 62; i += 6) {
-                lvlMap[j][i] = lvlMap[j][i + 1] = lvlMap[j][i + 2] = BRICK;
-            }
+        for (int i = 16; i <= 42; i = i + 6)
+            drawBrick(1, i);
+        for (int i = 2; i <= 4; i++) {
+            drawBrick(i, 19);
+            drawBrick(i, 37);
         }
+        drawBrick(2, 25);
+        drawBrick(2, 31);
+        for (int i = 25; i <= 31; i = i + 3)
+            drawBrick(4, i);
+        for (int j = 5; j <= 8; j++)
+            for (int i = 22; i <= 34; i = i + 3)
+                drawBrick(j, i);
+        drawBrick(9, 28);
+        for (int i = 13; i <= 14; i++) {
+            drawBrick(i, 7);
+            drawBrick(i, 49);
+        }
+        for (int i = 9; i <= 14; i++) {
+            drawBrick(i, 19);
+            drawBrick(i, 37);
+        }
+        drawBrick(12, 22);
+        drawBrick(14, 22);
+        drawBrick(12, 34);
+        drawBrick(14, 34);
+        for (int i = 9; i <= 14; i++)
+            lvlMap[i][18] = lvlMap[i][40] = '3';
+        for (int i = 19; i <= 25; i++)
+            lvlMap[15][i] = lvlMap[15][i + 14] = '3';
+        for (int i = 22; i <= 25; i++)
+            lvlMap[13][i] = lvlMap[13][i + 11] = '3';
+        for (int i = 25; i <= 33; i++)
+            lvlMap[18][i] = '#';
+        lvlMap[14][25] = lvlMap[14][33] = '3';
+        for (int i = 19; i <= 20; i++) {
+            drawBrick(i, 13);
+            drawBrick(i, 43);
+        }
+        for (int i = 5; i <= 6; i++) {
+            drawBrick(i, 4);
+            drawBrick(i, 52);
+        }
+        for (int i = 25; i <= 27; i++)
+            lvlMap[9][i] = lvlMap[9][i + 6] = '2';
     }
+
+    
+    if (lvl == 4) {
+        int k = 0;
+        int d = 1;
+        for (int i = 2; i <= 19; i++) {
+            drawBrick(i, 1);
+            k = i;
+            while (k > 2) {
+                drawBrick(i, d + 3);
+                d += 3;
+                k--;
+            }
+            d = 1;
+        }
+        for (int i = 1; i <= 54; i++)
+            lvlMap[20][i] = '3';
+        drawBrick(20, 55);
+        lvlMap[20][58] = '3';
+    }
+    
+
 }
 
 void lvlMapInit(int lvl) {
@@ -458,6 +545,7 @@ void show() {
     for (int i = 0; i < HEIGHT; i++) {
         cout << mas[i];
         
+        // Инструкция управления
         if (i == 2) {
             cout << "\t\tControl ";
         }
@@ -472,6 +560,29 @@ void show() {
         }
         if (i == 6) {
             cout << "\tK - skip level";
+        }
+        if (i == 7) {
+           cout << "\tP - pause";
+        }
+        if (i == 8) {
+            cout << "\tESC - exit";
+        }
+        if (i == 9) {
+            cout << "\tSPACE - shoot";
+        }
+
+        // Бонусные улучшения
+        if (i == 12) {
+            cout << "\t\tUpgrades ";
+        }
+        if (i == 13) {
+            cout << "\tW - wide";
+        }
+        if (i == 14) {
+            cout << "\tT - thin";
+        }
+        if (i == 15) {
+            cout << "\tF - fire mode";
         }
         
         if (i < HEIGHT) {
@@ -503,18 +614,12 @@ void setCursor(short x, short y) {
 
 void showPreview() {
     system("cls");
-    cout << endl
-        << endl
-        << endl
-        << endl
-        << endl
-        << endl
-        << "\t\t\t\tLVL " << lvl;
+    cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\tLVL " << lvl << endl;
     Sleep(1000);
     system("cls");
 }
 
-void checkFaild() {
+bool checkFaild() {
     if (ball.y >= HEIGHT - 1) {
         run = false;
         hp.pop_back();
@@ -525,12 +630,14 @@ void checkFaild() {
             lvlMapInit(lvl);
             hp = "\3\3\3";
             maxHitCount = 0;
-            initRacket();
             objArrClear();
         }
         hitCount = 0;
         system("cls");
+        initRacket();
+        return true;
     }
+    return false;
 }
 
 int lvlMapBrickCount() {
@@ -549,7 +656,7 @@ void checkWin() {
     if ((lvlMapBrickCount() == 0) || skip) {
         lvl++;
         hp = "\3\3\3";
-        if (lvl > 3) {
+        if (lvl > 4) {
             lvl = 1;
         }
         lvlMapInit(lvl);
@@ -581,31 +688,94 @@ void racketShout() {
     racket.fireMode += 10;
 }
 
-int flag = 0; // костыли
-time_t start = 0;
-
-// Засекает 10 сек после чего отключает fire mode
-void timerFireMod() {
-    flag++;
-    if (flag == 1)
-        start = time(NULL);
-    if ((time(NULL) - start) < 8)
-        return;
-    else {
-        start = 0;
-        flag = 0;
-    }
-    racket.fireMode = 0;
-}
-
 void racketWork() {
     if (racket.fireMode > 1)
         racket.fireMode--;
-    timerFireMod();
 }
+
+char menu;
+
+void showInstruction() {
+    system("cls");
+    cout << "\n\n\n\n\n\n\n\t\t\t\tI N S T R U C T I O N \n\n"
+        << "\t\t\tControl\n\n"
+        << "\t\t\tW - running the ball\n"
+        << "\t\t\tA - movement to the left\n"
+        << "\t\t\tD - movement to the right\n"
+        << "\t\t\tK - skip level\n"
+        << "\t\t\tP - pause\n"
+        << "\t\t\tSPACE - shoot\n"
+        << "\t\t\tESC - exit\n\n"
+        << "\t\t\tUpgrades\n\n"
+        << "\t\t\tW - wide\n"
+        << "\t\t\tT - thin\n"
+        << "\t\t\tF - fire mode\n\n\n";
+    cout << "\t\t\tgo back - 4\n";
+    menu = getchar();
+    if (menu == '4') {
+        menu = ' ';
+        showMenu();
+    }
+    else {
+        menu = ' ';
+        showInstruction();
+    }
+    
+    
+}
+
+void showInfo() {
+    system("cls");
+    cout << "\n\n\n\n\n\n\n\t\t\t\t\tI N F O \n\n\n\n\n\n\n\n\n\n\n\n"
+        << "\tauthor: Gosudarev Danila\n"
+        << "\temail:  danidagosudarev@gmail.com\n"
+        << "\tgitHub: https://github.com/dag0S/arkanoid.git \n\n";
+
+    cout << "\tgo back - 4\n";
+    menu = getchar();
+    if (menu == '4') {
+        menu = ' ';
+        showMenu();
+    }
+    else {
+        menu = ' ';
+        showInfo();
+    }
+}
+
+void showMenu() {
+    system("cls");
+    cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\tA R K A N O I D \n\n"
+        << "\t\t\t\t1 Start      \n"
+        << "\t\t\t\t2 Instruction\n"
+        << "\t\t\t\t3 Info       \n\n";
+    
+    menu = getchar();
+    if (menu == '1') {
+        return;
+    }
+    else if (menu == '2') {
+        menu = ' ';
+        showInstruction();
+    }
+    else if (menu == '3') {
+        menu = ' ';
+        showInfo();
+    }
+    else {
+        menu = ' ';
+        showMenu();
+    }
+    
+}
+
 
 int main()
 {
+    srand(time(NULL));
+
+    bool ballFaild = false;
+
     system("mode con cols=90 lines=36");
 
     initRacket();
@@ -614,16 +784,19 @@ int main()
 
     lvlMapInit(lvl);
 
+    showMenu();
+
     showPreview();
 
     do {
+
         ballWork();
 
-        objArrWork();
+        ballFaild = checkFaild();
+
+        objArrWork(ballFaild);
 
         racketWork();
-
-        checkFaild();
 
         checkWin();
 
@@ -649,6 +822,21 @@ int main()
             run = true;
         }
 
+        bool pause = false;
+
+        if ((GetKeyState('P') < 0) && (pause == false)) {
+            system("cls");
+            pause = true;
+            cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t   P A U S E" << endl;
+            Sleep(500);
+            while ((GetKeyState('P')) >= 0) {
+                Sleep(1);
+            }
+            pause = false;
+            Sleep(500);
+            system("cls");
+        }
+
         if (GetKeyState(VK_SPACE) < 0) {
             racketShout();
         }
@@ -661,7 +849,7 @@ int main()
       
         Sleep(10);
 
-    } while (GetKeyState(VK_ESCAPE) >= 0);
+    } while ((GetKeyState(VK_ESCAPE) >= 0) && (menu == '1'));
 
     return 0;
 }

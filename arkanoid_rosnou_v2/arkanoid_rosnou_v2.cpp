@@ -39,7 +39,7 @@ TRacket racket;
 TBall ball;
 int hitCount = 0;
 int maxHitCount = 0;
-int lvl = 4;
+int lvl = 1;
 bool run = false;
 bool skip = false;
 string hp = "\3\3\3";
@@ -159,16 +159,19 @@ void objArrClear() {
     objArrCnt = 0;
 }
 
+// Инициализачия позиции шарика
 void initBall() {
     moveBall(2, 2);
     ball.alfa = -1;
     ball.speed = 0.5;
 }
 
+// Кладет шарик на карту
 void putBall() {
     mas[ball.iy][ball.ix] = '\1';
 }
 
+// Двигает шарик по карте
 void moveBall(float x, float y) {
     ball.x = x;
     ball.y = y;
@@ -193,9 +196,8 @@ char objHitBrick(TObj ball) {
         for (int i = 0; i < BRICK_WIDTH; i++) {
             static char* c;
             c = &lvlMap[ball.iy][i + dx];
-            if (*c == BRICK) {
+            if (*c == BRICK)
                 *c = ' ';
-            }
         }
         return 1;
     }
@@ -218,14 +220,13 @@ char objHitDigit(TObj ball) {
     return 0;
 }
 
+// автоматическое движение мячика
 void autoMoveBall() {
-    if (ball.alfa < 0) {
+    if (ball.alfa < 0)
         ball.alfa += M_PI * 2;
-    }
 
-    if (ball.alfa > M_PI * 2) {
+    if (ball.alfa > M_PI * 2)
         ball.alfa -= M_PI * 2;
-    }
 
     TBall b1 = ball;
 
@@ -248,25 +249,20 @@ void autoMoveBall() {
         }
         else if ((ball.ix != b1.ix) && (ball.iy != b1.iy)) {
 
-            if (mas[b1.iy][ball.ix] == mas[ball.iy][b1.ix]) {
+            if (mas[b1.iy][ball.ix] == mas[ball.iy][b1.ix])
                 b1.alfa = b1.alfa + M_PI;
-            }
             else {
 
-                if (mas[b1.iy][ball.ix] == '#') {
+                if (mas[b1.iy][ball.ix] == '#')
                     b1.alfa = (2 * M_PI - b1.alfa) + M_PI;
-                }
-                else {
+                else
                     b1.alfa = (2 * M_PI - b1.alfa);
-                }
             }
         }
-        else if (ball.iy == b1.iy) {
+        else if (ball.iy == b1.iy)
             b1.alfa = (2 * M_PI - b1.alfa) + M_PI;
-        } 
-        else {
+        else
             b1.alfa = (2 * M_PI - b1.alfa);
-        }
 
         ball = b1;
     }
@@ -299,23 +295,23 @@ void timerFireMod() {
 
 // помещение ракетки в локацию
 void putRacket() {
-    for (int i = racket.x; i < racket.x + racket.widthRacket; i++) {
+    for (int i = racket.x; i < racket.x + racket.widthRacket; i++)
         mas[racket.y][i] = '"';
-    }
     if (racket.fireMode > 0) {
         mas[racket.y - 1][racket.x + racket.widthRacket / 2] = '|';
         timerFireMod();
     }
 }
 
+// рисует кирпич в указанных координатах
 void drawBrick(int x, int y) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
         lvlMap[x][y + i] = BRICK;
-    }
 }
 
 // инициализация карты
 void lvlMapPuzzile() {
+    // lvl 1
     if (lvl == 1) {
         // Р
         for (int i = 3; i <= 8; i++)
@@ -369,6 +365,7 @@ void lvlMapPuzzile() {
         drawBrick(14, 52);
     }
 
+    // lvl 2
     if (lvl == 2) {
         for (int i = 9; i <= 49; i++)
             lvlMap[15][i] = '3';
@@ -416,6 +413,7 @@ void lvlMapPuzzile() {
         }
     }
 
+    // lvl 3
     if (lvl == 3) {
         for (int i = 16; i <= 42; i = i + 6)
             drawBrick(1, i);
@@ -464,7 +462,7 @@ void lvlMapPuzzile() {
             lvlMap[9][i] = lvlMap[9][i + 6] = '2';
     }
 
-    
+    // lvl 4
     if (lvl == 4) {
         int k = 0;
         int d = 1;
@@ -483,35 +481,33 @@ void lvlMapPuzzile() {
         drawBrick(20, 55);
         lvlMap[20][58] = '3';
     }
-    
-
 }
 
-void lvlMapInit(int lvl) {
+// Заполняет уровень пробелами и рисует стенки
+void lvlMapInit() {
     memset(lvlMap, ' ', sizeof(lvlMap));
 
     lvlMapPuzzile();
 
-    for (int i = 0; i < WIDTH; i++) {
+    for (int i = 0; i < WIDTH; i++)
         lvlMap[0][i] = '#';
-    }
-    for (int j = 0; j < HEIGHT; j++) {
+    for (int j = 0; j < HEIGHT; j++)
         lvlMap[j][0] = lvlMap[j][WIDTH - 1] = '#';
-    }
 }
 
+// копирует карту уровня в буффер вывода
 void lvlMapPut() {
     memset(mas, 0, sizeof(mas));
 
-    for (int j = 0; j < HEIGHT; j++) {
+    for (int j = 0; j < HEIGHT; j++)
         memcpy(mas[j], lvlMap[j], sizeof(**lvlMap) * WIDTH);
-    }
 }
 
-// показ карты
+// показ карты и худа
 void show() {
     setCursor(0, 0);
 
+    // HUD
     cout << endl;
     cout << "+--------------+----------------------+--------------------+" << endl;
     cout << "|    hp " << hp;
@@ -546,48 +542,35 @@ void show() {
         cout << mas[i];
         
         // Инструкция управления
-        if (i == 2) {
+        if (i == 2) 
             cout << "\t\tControl ";
-        }
-        if (i == 3) {
+        if (i == 3) 
             cout << "\tW - running the ball";
-        }
-        if (i == 4) {
+        if (i == 4) 
             cout << "\tA - movement to the left";
-        }
-        if (i == 5) {
+        if (i == 5) 
             cout << "\tD - movement to the right";
-        }
-        if (i == 6) {
+        if (i == 6) 
             cout << "\tK - skip level";
-        }
-        if (i == 7) {
+        if (i == 7) 
            cout << "\tP - pause";
-        }
-        if (i == 8) {
+        if (i == 8) 
             cout << "\tESC - exit";
-        }
-        if (i == 9) {
+        if (i == 9) 
             cout << "\tSPACE - shoot";
-        }
 
         // Бонусные улучшения
-        if (i == 12) {
+        if (i == 12) 
             cout << "\t\tUpgrades ";
-        }
-        if (i == 13) {
+        if (i == 13) 
             cout << "\tW - wide";
-        }
-        if (i == 14) {
+        if (i == 14) 
             cout << "\tT - thin";
-        }
-        if (i == 15) {
+        if (i == 15) 
             cout << "\tF - fire mode";
-        }
         
-        if (i < HEIGHT) {
+        if (i < HEIGHT) 
             cout << endl;
-        }
     }
 }
 
@@ -595,13 +578,11 @@ void show() {
 void moveRacket(int x) {
     racket.x = x;
 
-    if (racket.x < 1) {
+    if (racket.x < 1)
         racket.x = 1;
-    }
 
-    if (racket.x + racket.widthRacket >= WIDTH) {
+    if (racket.x + racket.widthRacket >= WIDTH) 
         racket.x = WIDTH - 1 - racket.widthRacket;
-    }
 }
 
 // переводит курсор в верхний левый угол
@@ -619,15 +600,15 @@ void showPreview() {
     system("cls");
 }
 
+// проверяет вылетел ли мяч за нижнюю границу
 bool checkFaild() {
     if (ball.y >= HEIGHT - 1) {
         run = false;
         hp.pop_back();
-        if (hitCount > maxHitCount) {
+        if (hitCount > maxHitCount)
             maxHitCount = hitCount;
-        }
         if (hp == "") {
-            lvlMapInit(lvl);
+            lvlMapInit();
             hp = "\3\3\3";
             maxHitCount = 0;
             objArrClear();
@@ -644,22 +625,21 @@ int lvlMapBrickCount() {
     int count = 0;
     for (int j = 0; j < HEIGHT; j++) {
         for (int i = 0; i < WIDTH; i++) {
-            if (lvlMap[j][i] == BRICK) {
+            if (lvlMap[j][i] == BRICK)
                 count++;
-            }
         }
     }
     return count;
 }
 
+// проверяет пройден ли уровень
 void checkWin() {
     if ((lvlMapBrickCount() == 0) || skip) {
         lvl++;
         hp = "\3\3\3";
-        if (lvl > 4) {
+        if (lvl > 4)
             lvl = 1;
-        }
-        lvlMapInit(lvl);
+        lvlMapInit();
         run = false;
         skip = false;
         maxHitCount = 0;
@@ -672,11 +652,11 @@ void checkWin() {
 }
 
 void ballWork() {
-    if (run) {
+    if (run)
         autoMoveBall();
-    }
     else {
         moveBall(racket.x + racket.widthRacket / 2, racket.y - 1);
+        ball.alfa = -M_PI_2 - 0.5;
     }
 }
 
@@ -695,6 +675,7 @@ void racketWork() {
 
 char menu;
 
+// пунки меню - Инструкция
 void showInstruction() {
     system("cls");
     cout << "\n\n\n\n\n\n\n\t\t\t\tI N S T R U C T I O N \n\n"
@@ -720,10 +701,9 @@ void showInstruction() {
         menu = ' ';
         showInstruction();
     }
-    
-    
 }
 
+// пунки меню - Информация
 void showInfo() {
     system("cls");
     cout << "\n\n\n\n\n\n\n\t\t\t\t\tI N F O \n\n\n\n\n\n\n\n\n\n\n\n"
@@ -743,17 +723,16 @@ void showInfo() {
     }
 }
 
+// меню
 void showMenu() {
     system("cls");
     cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\tA R K A N O I D \n\n"
         << "\t\t\t\t1 Start      \n"
         << "\t\t\t\t2 Instruction\n"
         << "\t\t\t\t3 Info       \n\n";
-    
     menu = getchar();
-    if (menu == '1') {
+    if (menu == '1')
         return;
-    }
     else if (menu == '2') {
         menu = ' ';
         showInstruction();
@@ -766,61 +745,40 @@ void showMenu() {
         menu = ' ';
         showMenu();
     }
-    
 }
-
 
 int main()
 {
     srand(time(NULL));
-
     bool ballFaild = false;
-
     system("mode con cols=90 lines=36");
 
     initRacket();
-
     initBall();
-
-    lvlMapInit(lvl);
-
+    lvlMapInit();
     showMenu();
-
     showPreview();
 
     do {
-
         ballWork();
-
         ballFaild = checkFaild();
-
         objArrWork(ballFaild);
-
         racketWork();
-
         checkWin();
-
         lvlMapPut();
-
         putRacket();
-
         putBall();
-
         objArrPut();
+        show();
 
-        show(); // вызов show
-
-        if (GetKeyState('A') < 0) {
+        if (GetKeyState('A') < 0)
             moveRacket(racket.x - 1);
-        }
 
-        if (GetKeyState('D') < 0) {
+        if (GetKeyState('D') < 0)
             moveRacket(racket.x + 1);
-        }
 
-        if (GetKeyState('W') < 0) {
+        if (GetKeyState('W') < 0)
             run = true;
-        }
 
         bool pause = false;
 
@@ -837,9 +795,8 @@ int main()
             system("cls");
         }
 
-        if (GetKeyState(VK_SPACE) < 0) {
+        if (GetKeyState(VK_SPACE) < 0)
             racketShout();
-        }
 
         if (GetKeyState('K') < 0) {
             Sleep(100);

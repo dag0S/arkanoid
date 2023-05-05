@@ -8,9 +8,9 @@
 #include <ctime> 
 
 #define WIDTH 60
-#define HEIGHT 30
+#define HEIGHT 24
 
-#define BRICK (char)176
+#define BRICK 'X'
 #define BRICK_WIDTH 3
 
 using namespace std;
@@ -168,7 +168,7 @@ void initBall() {
 
 // Кладет шарик на карту
 void putBall() {
-    mas[ball.iy][ball.ix] = '\1';
+    mas[ball.iy][ball.ix] = 'o';
 }
 
 // Двигает шарик по карте
@@ -751,7 +751,6 @@ int main()
 {
     srand(time(NULL));
     bool ballFaild = false;
-    system("mode con cols=90 lines=36");
 
     initRacket();
     initBall();

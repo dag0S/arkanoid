@@ -2,21 +2,40 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <windows.h>
-#include <cassert> 
 #include <math.h> 
 #include <ctime> 
 
 #define WIDTH 60
 #define HEIGHT 24
 
+#define BALL 'o'
+#define RACKET '"'
+#define BORDER '#'
+#define GUN '|'
+#define BULLET '.'
 #define BRICK 'X'
 #define BRICK_WIDTH 3
 
+#define WIDE 'W'
+#define THIN 'T'
+#define FIRE 'F'
+#define QUICKLY 'Q'
+#define SLOW 'S'
+
+#define OBJ_ARR_SIZE 1000 // Максимально возможное кол-во объектов
+#define OBJ_UPGRADE_TYPES_RAND_MAX 18
+
 using namespace std;
 
-char mas[HEIGHT][WIDTH + 1];
-char lvlMap[HEIGHT][WIDTH];
+vector<vector<char>> mas (
+    HEIGHT,
+    vector<char>(WIDTH + 1));
+
+vector<vector<char>> lvlMap(
+    HEIGHT,
+    vector<char>(WIDTH));
 
 // Ракетка
 struct TRacket {
@@ -37,26 +56,22 @@ typedef struct {
 
 TRacket racket;
 TBall ball;
+
 int hitCount = 0;
 int maxHitCount = 0;
 int lvl = 1;
+int speed = 10;
 bool run = false;
 bool skip = false;
 string hp = "\3\3\3";
 
-// Максимально возможное кол-во объектов
-#define OBJ_ARR_SIZE 1000
 TObj objArr[OBJ_ARR_SIZE];
 int objArrCnt = 0;
 
-#define WIDE 'W'
-#define THIN 'T'
-#define FIRE 'F'
-#define BULLET '.'
-#define OBJ_UPGRADE_TYPES_RAND_MAX 18
-char objUpgradeTypes[] = { WIDE, THIN, FIRE };
+char objUpgradeTypes[] = { WIDE, THIN, FIRE, QUICKLY, SLOW };
 int objUpgradeTypesCnt = sizeof(objUpgradeTypes) / sizeof(objUpgradeTypes[0]);
 
+void objArrClear();
 void moveBall(float x, float y);
 void setCursor(short x, short y);
 char objHitBrick(TObj ball);
@@ -93,8 +108,8 @@ void objMove(TObj *obj) {
 }
 
 void objWorkUpgrade(TObj* obj) {
-    if (mas[obj->iy][obj->ix] != '"')
-        return;
+    if (mas[obj->iy][obj->ix] != RACKET) 
+        return; 
     if (obj->type == WIDE)
         racket.widthRacket = min(racket.widthRacket + 1, 15), obj->del = 1;
     if (obj->type == THIN)
@@ -104,13 +119,23 @@ void objWorkUpgrade(TObj* obj) {
             racket.fireMode = 1;
         obj->del = 1;
     }
+    if (obj->type == SLOW) {
+        if (speed < 16)
+            speed += 1;
+        obj->del = 1;
+    }
+    if (obj->type == QUICKLY) {
+        if (speed > 7)
+            speed -= 1;
+        obj->del = 1;
+    }
 }
 
 // Обработчик пуль
 void objWorkBullet(TObj* obj) {
     if (obj->type != BULLET)
         return;
-    if ((objHitBrick(*obj)) || (objHitDigit(*obj)) || (mas[obj->iy][obj->ix] == '#'))
+    if ((objHitBrick(*obj)) || (objHitDigit(*obj)) || (mas[obj->iy][obj->ix] == BORDER))
         obj->del = 1;
 }
 
@@ -123,7 +148,6 @@ void objWork(TObj* obj) {
 
 // Добавляет объект в массив
 void objArrAdd(TObj obj) {
-    assert(objArrCnt + 1 < OBJ_ARR_SIZE);
     objArr[objArrCnt] = obj;
     objArrCnt++;
 }
@@ -140,8 +164,8 @@ void objArrDelPos(int pos) {
 void objArrWork(bool ballFaild) {
     int i = 0;
     while (i < objArrCnt) {
-        objWork(objArr + i);
-        if (objArr[i].y < 0 || objArr[i].y > HEIGHT || objArr[i].del || ballFaild)
+        objWork(&objArr[i]);
+        if (objArr[i].y < 0 || objArr[i].y >= (HEIGHT - 1) || objArr[i].del || ballFaild)
             objArrDelPos(i);
         else
             i++;
@@ -168,7 +192,7 @@ void initBall() {
 
 // Кладет шарик на карту
 void putBall() {
-    mas[ball.iy][ball.ix] = 'o';
+    mas[ball.iy][ball.ix] = BALL;
 }
 
 // Двигает шарик по карте
@@ -234,17 +258,16 @@ void autoMoveBall() {
 
     objHitDigit(ball);
 
-    if ((mas[ball.iy][ball.ix] == '#') || (mas[ball.iy][ball.ix] == '"') || (mas[ball.iy][ball.ix] == BRICK) || ((mas[ball.iy][ball.ix] == '1')
+    if ((mas[ball.iy][ball.ix] == BORDER) || (mas[ball.iy][ball.ix] == RACKET) || (mas[ball.iy][ball.ix] == BRICK) || ((mas[ball.iy][ball.ix] == '1')
         || (mas[ball.iy][ball.ix] == '2') || (mas[ball.iy][ball.ix] == '3'))) {
         
         objHitBrick(ball);
 
-        if (mas[ball.iy][ball.ix] == '"') {
+        if (mas[ball.iy][ball.ix] == RACKET) {
             hitCount++;
             float pos = ball.x - racket.x;
             float psi = pos / racket.widthRacket * 2;
-            psi = (psi - 1) * M_PI_2 * 0.9;
-            assert((psi < M_PI_2) && (psi > -M_PI_2));
+            psi = (psi - 1) * M_PI_2 * 0.5;
             b1.alfa = -M_PI_2 + psi;
         }
         else if ((ball.ix != b1.ix) && (ball.iy != b1.iy)) {
@@ -253,7 +276,7 @@ void autoMoveBall() {
                 b1.alfa = b1.alfa + M_PI;
             else {
 
-                if (mas[b1.iy][ball.ix] == '#')
+                if (mas[b1.iy][ball.ix] == BORDER)
                     b1.alfa = (2 * M_PI - b1.alfa) + M_PI;
                 else
                     b1.alfa = (2 * M_PI - b1.alfa);
@@ -296,9 +319,9 @@ void timerFireMod() {
 // помещение ракетки в локацию
 void putRacket() {
     for (int i = racket.x; i < racket.x + racket.widthRacket; i++)
-        mas[racket.y][i] = '"';
+        mas[racket.y][i] = RACKET;
     if (racket.fireMode > 0) {
-        mas[racket.y - 1][racket.x + racket.widthRacket / 2] = '|';
+        mas[racket.y - 1][racket.x + racket.widthRacket / 2] = GUN;
         timerFireMod();
     }
 }
@@ -485,22 +508,24 @@ void lvlMapPuzzile() {
 
 // Заполняет уровень пробелами и рисует стенки
 void lvlMapInit() {
-    memset(lvlMap, ' ', sizeof(lvlMap));
+
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            lvlMap[i][j]= ' ';
+        }
+    }
 
     lvlMapPuzzile();
 
     for (int i = 0; i < WIDTH; i++)
-        lvlMap[0][i] = '#';
+        lvlMap[0][i] = BORDER;
     for (int j = 0; j < HEIGHT; j++)
-        lvlMap[j][0] = lvlMap[j][WIDTH - 1] = '#';
+        lvlMap[j][0] = lvlMap[j][WIDTH - 1] = BORDER;
 }
 
 // копирует карту уровня в буффер вывода
 void lvlMapPut() {
-    memset(mas, 0, sizeof(mas));
-
-    for (int j = 0; j < HEIGHT; j++)
-        memcpy(mas[j], lvlMap[j], sizeof(**lvlMap) * WIDTH);
+    mas = lvlMap;
 }
 
 // показ карты и худа
@@ -539,38 +564,47 @@ void show() {
     cout << "  |" << endl << "+--------------+----------------------+--------------------+" << endl << endl;
 
     for (int i = 0; i < HEIGHT; i++) {
-        cout << mas[i];
         
+        string str(mas[i].begin(), mas[i].end());
+
+        cout << str;
+
         // Инструкция управления
-        if (i == 2) 
-            cout << "\t\tControl ";
-        if (i == 3) 
-            cout << "\tW - running the ball";
-        if (i == 4) 
-            cout << "\tA - movement to the left";
-        if (i == 5) 
-            cout << "\tD - movement to the right";
-        if (i == 6) 
-            cout << "\tK - skip level";
-        if (i == 7) 
-           cout << "\tP - pause";
-        if (i == 8) 
-            cout << "\tESC - exit";
-        if (i == 9) 
-            cout << "\tSPACE - shoot";
+        if (i == 4)
+            cout << "\t\t\t\tControl ";
+        if (i == 6)
+            cout << "\t\t\tW - running the ball";
+        if (i == 7)
+            cout << "\t\t\tA - movement to the left";
+        if (i == 8)
+            cout << "\t\t\tD - movement to the right";
+        if (i == 9)
+            cout << "\t\t\tK - skip level";
+        if (i == 10)
+            cout << "\t\t\tP - pause";
+        if (i == 11)
+            cout << "\t\t\tESC - exit";
+        if (i == 12)
+            cout << "\t\t\tSPACE - shoot";
 
         // Бонусные улучшения
-        if (i == 12) 
-            cout << "\t\tUpgrades ";
-        if (i == 13) 
-            cout << "\tW - wide";
-        if (i == 14) 
-            cout << "\tT - thin";
-        if (i == 15) 
-            cout << "\tF - fire mode";
-        
-        if (i < HEIGHT) 
+        if (i == 14)
+            cout << "\t\t\t\tUpgrades ";
+        if (i == 16)
+            cout << "\t\t\tW - wide";
+        if (i == 17)
+            cout << "\t\t\tT - thin";
+        if (i == 18)
+            cout << "\t\t\tF - fire mode";
+        if (i == 19)
+            cout << "\t\t\tQ - quickly";
+        if (i == 20)
+            cout << "\t\t\tS - slow";
+
+        if (i < HEIGHT)
             cout << endl;
+        
+       
     }
 }
 
@@ -603,6 +637,7 @@ void showPreview() {
 // проверяет вылетел ли мяч за нижнюю границу
 bool checkFaild() {
     if (ball.y >= HEIGHT - 1) {
+        speed = 10;
         run = false;
         hp.pop_back();
         if (hitCount > maxHitCount)
@@ -635,6 +670,7 @@ int lvlMapBrickCount() {
 // проверяет пройден ли уровень
 void checkWin() {
     if ((lvlMapBrickCount() == 0) || skip) {
+        speed = 10;
         lvl++;
         hp = "\3\3\3";
         if (lvl > 4)
@@ -690,7 +726,9 @@ void showInstruction() {
         << "\t\t\tUpgrades\n\n"
         << "\t\t\tW - wide\n"
         << "\t\t\tT - thin\n"
-        << "\t\t\tF - fire mode\n\n\n";
+        << "\t\t\tF - fire mode\n"
+        << "\t\t\tQ - quickly\n"
+        << "\t\t\tS - slow\n\n";
     cout << "\t\t\tgo back - 4\n";
     menu = getchar();
     if (menu == '4') {
@@ -803,7 +841,7 @@ int main()
             checkWin();
         }
       
-        Sleep(10);
+        Sleep(speed);
 
     } while ((GetKeyState(VK_ESCAPE) >= 0) && (menu == '1'));
 

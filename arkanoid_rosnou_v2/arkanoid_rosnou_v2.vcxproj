@@ -141,6 +141,16 @@
   <ItemGroup>
     <ClCompile Include="arkanoid_rosnou_v2.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Ball.h" />
+    <ClInclude Include="Headers.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="Racket.h" />
+    <ClInclude Include="Utilis.h" />
+    <ClInclude Include="Variables.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

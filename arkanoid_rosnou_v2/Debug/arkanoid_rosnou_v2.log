@@ -4,18 +4,22 @@ G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(27,30): warning C43
 G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(44,38): warning C4244: =: преобразование "double" в "float", возможна потеря данных
 G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(45,31): warning C4244: =: преобразование "double" в "float", возможна потеря данных
 G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(50,35): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(54,52): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(56,41): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(60,44): warning C4244: =: преобразование "double" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(62,33): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(53,36): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(55,40): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(59,28): warning C4244: =: преобразование "double" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(61,32): warning C4244: =: преобразование "double" в "float", возможна потеря данных
 G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(72,62): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
 G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(72,27): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
 G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Ball.h(73,34): warning C4305: =: усечение из "double" в "float"
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Racket.h(34,94): warning C4305: аргумент: усечение из "double" в "float"
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Racket.h(34,69): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Racket.h(34,34): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Racket.h(34,95): warning C4305: аргумент: усечение из "double" в "float"
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Racket.h(34,70): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Racket.h(34,35): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
 G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Object.h(15,23): warning C4305: +=: усечение из "double" в "float"
 G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Object.h(17,23): warning C4305: -=: усечение из "double" в "float"
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Object.h(112,66): warning C4305: аргумент: усечение из "double" в "float"
-G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(23,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Object.h(83,14): warning C4018: <: несоответствие типов со знаком и без знака
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Object.h(94,23): warning C4018: <: несоответствие типов со знаком и без знака
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Object.h(106,11): warning C4018: <: несоответствие типов со знаком и без знака
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\Object.h(107,67): warning C4305: аргумент: усечение из "double" в "float"
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(23,1): warning C4326: возвращаемый тип "main" должен быть "int", а не "void"
+G:\cpp-projects\arkanoid_rosnou_v2\arkanoid_rosnou_v2\arkanoid_rosnou_v2.cpp(24,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
   arkanoid_rosnou_v2.vcxproj -> G:\cpp-projects\arkanoid_rosnou_v2\Debug\arkanoid_rosnou_v2.exe

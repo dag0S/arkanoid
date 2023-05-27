@@ -1,5 +1,5 @@
 #define WIDTH 60
-#define HEIGHT 24
+#define HEIGHT 25
 
 #define BALL 'o'
 #define RACKET '"'
@@ -15,7 +15,6 @@
 #define QUICKLY 'Q'
 #define SLOW 'S'
 
-#define OBJ_ARR_SIZE 1000 // ћаксимально возможное кол-во объектов
 #define OBJ_UPGRADE_TYPES_RAND_MAX 18 // Ўанс выподени€ улучшени€
 
 using namespace std;
@@ -55,7 +54,8 @@ int maxHitCount = 0;   // общее кол-во ударов м€ча о ракетку
 int lvl = 1;           // текущий уровень
 int speed = 10;        // скорость игры
 bool run = false;      // запуск м€ч
-bool skip = false;     // скир уровн€
+bool skip = false;     // скип уровн€
+bool pause = false;    // пауза
 string hp = "\3\3\3";  // жизни ракетки
 
 // переменные дл€ ф-ции rimerDireMode
@@ -63,8 +63,7 @@ int flag = 0;
 int timeForFire = 5;
 time_t start = 0;
 
-TObj objArr[OBJ_ARR_SIZE];  // массив объектов
-int objArrCnt = 0;          // кол-во объектов в массиве objArr
+char menu;   // выбор пункта меню
 
-char objUpgradeTypes[] = { WIDE, THIN, FIRE, QUICKLY, SLOW };                   // массив бонусных улучшений
-int objUpgradeTypesCnt = sizeof(objUpgradeTypes) / sizeof(objUpgradeTypes[0]);  // кол-во бонусных улучшений
+vector <TObj> objArr;  // массив объектов
+vector <char> objUpgradeTypes = { WIDE, THIN, FIRE, QUICKLY, SLOW };   // массив бонусных улучшений

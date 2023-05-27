@@ -2,11 +2,12 @@
 
 // Библиотеки
 #include <iostream>
+#include <conio.h>
 #include <string>
 #include <vector>
 #include <windows.h>
 #include <cmath> 
-#include <ctime> 
+#include <ctime>
 
 // Заголовки с кодом
 #include "Variables.h"
@@ -18,7 +19,7 @@
 #include "Menu.h"
 #include "Utilis.h"
 
-int main()
+void main()
 {
     srand(time(NULL));
 
@@ -48,19 +49,8 @@ int main()
         if (GetKeyState('W') < 0)
             run = true;
 
-        bool pause = false;
-
         if ((GetKeyState('P') < 0) && (pause == false)) {
-            system("cls");
-            pause = true;
-            cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t   P A U S E" << endl;
-            Sleep(500);
-            while ((GetKeyState('P')) >= 0) {
-                Sleep(1);
-            }
-            pause = false;
-            Sleep(500);
-            system("cls");
+            showPause();
         }
 
         if (GetKeyState(VK_SPACE) < 0)
@@ -73,8 +63,5 @@ int main()
         }
       
         Sleep(speed);
-
-    } while ((GetKeyState(VK_ESCAPE) >= 0) && (menu == '1'));
-
-    return 0;
+    } while (GetKeyState(VK_ESCAPE) >= 0);
 }

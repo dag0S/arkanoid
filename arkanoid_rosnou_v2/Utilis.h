@@ -41,6 +41,7 @@ bool checkFaild() {
     return false;
 }
 
+// счетчик кол-ва кирпичиков 
 int lvlMapBrickCount() {
     int count = 0;
     for (int j = 0; j < HEIGHT; j++) {
@@ -70,4 +71,17 @@ void checkWin() {
         system("cls");
         showPreview();
     }
+}
+
+// Пауза
+void showPause() {
+    system("cls");
+    pause = true;
+    cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t   P A U S E" << endl;
+    Sleep(500);
+    while ((GetKeyState('P')) >= 0)
+        Sleep(1);
+    pause = false;
+    Sleep(500);
+    system("cls");
 }

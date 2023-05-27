@@ -43,13 +43,11 @@ void objWorkUpgrade(TObj* obj) {
     }
     if (obj->type == SLOW) {
         if (speed < 16)
-            speed += 1;
-        obj->del = 1;
+            speed += 1, obj->del = 1;
     }
     if (obj->type == QUICKLY) {
         if (speed > 7)
-            speed -= 1;
-        obj->del = 1;
+            speed -= 1, obj->del = 1;
     }
 }
 
@@ -70,22 +68,19 @@ void objWork(TObj* obj) {
 
 // Добавляет объект в массив
 void objArrAdd(TObj obj) {
-    objArr[objArrCnt] = obj;
-    objArrCnt++;
+    objArr.push_back(obj);
 }
 
 // Удаляет объкт из массива
 void objArrDelPos(int pos) {
-    if (pos < 0 || pos >= objArrCnt)
-        return;
-    objArr[pos] = objArr[objArrCnt - 1];
-    objArrCnt--;
+    objArr[pos] = objArr[objArr.size() - 1];
+    objArr.pop_back();
 }
 
 // Обрабатывает все объекты в массиве
 void objArrWork(bool ballFaild) {
     int i = 0;
-    while (i < objArrCnt) {
+    while (i < objArr.size()) {
         objWork(&objArr[i]);
         if (objArr[i].y < 0 || objArr[i].y >= (HEIGHT - 1) || objArr[i].del || ballFaild)
             objArrDelPos(i);
@@ -96,20 +91,20 @@ void objArrWork(bool ballFaild) {
 
 // Кладет на карту все объекты
 void objArrPut() {
-    for (int i = 0; i < objArrCnt; i++)
+    for (int i = 0; i < objArr.size(); i++)
         objPut(objArr[i]);
 }
 
 // Очистка массива с объектами
 void objArrClear() {
-    objArrCnt = 0;
+    objArr.clear();
 }
 
-// Генерация случайного числа
+// Генерация случайного объекта
 void objChanceCreateRandomUpgradeObj(float x, float y) {
     int i = rand() % OBJ_UPGRADE_TYPES_RAND_MAX;
-    if (i < objUpgradeTypesCnt)
-        objArrAdd(objCreate(x, y, M_PI_2, 0.2, objUpgradeTypes[i]));
+    if (i < objUpgradeTypes.size())
+        objArrAdd( objCreate(x, y, M_PI_2, 0.2, objUpgradeTypes[i]) );
 }
 
 // Разрушение кирпичика
@@ -119,7 +114,7 @@ int objHitBrick(TObj ball) {
         int brickNom = (ball.ix - 1) / BRICK_WIDTH;
         int dx = 1 + brickNom * BRICK_WIDTH;
         for (int i = 0; i < BRICK_WIDTH; i++) {
-            static char* c;
+            char* c;
             c = &lvlMap[ball.iy][i + dx];
             if (*c == BRICK)
                 *c = ' ';

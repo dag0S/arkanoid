@@ -26,7 +26,7 @@ void autoMoveBall() {
     if (ball.alfa > M_PI * 2)
         ball.alfa -= M_PI * 2;
 
-    TBall b1 = ball;
+    TBall b1 = ball; // старые координаты
 
     moveBall(ball.x + cos(ball.alfa) * ball.speed, ball.y + sin(ball.alfa) * ball.speed);
 
@@ -37,34 +37,34 @@ void autoMoveBall() {
 
         objHitBrick(ball);
 
-        if (mas[ball.iy][ball.ix] == RACKET) {
+        if (mas[ball.iy][ball.ix] == RACKET) {               // Механика прицеливания
             hitCount++;
             float pos = ball.x - racket.x;
             float psi = pos / racket.widthRacket * 2;
-            psi = (psi - 1) * M_PI_2 * 0.5;
+            psi = (psi - 1) * M_PI_2 * 0.7;
             b1.alfa = -M_PI_2 + psi;
         }
-        else if ((ball.ix != b1.ix) && (ball.iy != b1.iy)) {
+        else if ((ball.ix != b1.ix) && (ball.iy != b1.iy)) { // Если изменились две координаты
 
-            if (mas[b1.iy][ball.ix] == mas[ball.iy][b1.ix])
-                b1.alfa = b1.alfa + M_PI;
-            else {
-
-                if (mas[b1.iy][ball.ix] == BORDER)
-                    b1.alfa = (2 * M_PI - b1.alfa) + M_PI;
+            if (mas[b1.iy][ball.ix] == mas[ball.iy][b1.ix])  // Если угол
+                b1.alfa = b1.alfa + M_PI;                    // Инверсия
+            else {                                          
+                if (mas[b1.iy][ball.ix] == BORDER)           // Если стены или потолок
+                    b1.alfa = M_PI - b1.alfa;                // Отражение по горизонтали
                 else
-                    b1.alfa = (2 * M_PI - b1.alfa);
+                    b1.alfa = 2 * M_PI - b1.alfa;            // Отражение по вертикали
             }
         }
-        else if (ball.iy == b1.iy)
-            b1.alfa = (2 * M_PI - b1.alfa) + M_PI;
-        else
-            b1.alfa = (2 * M_PI - b1.alfa);
+        else if (ball.iy == b1.iy)        // Если изменилась только X
+            b1.alfa = M_PI - b1.alfa;     // Отражение по горизонтали
+        else                              // Если изменилась только Y
+            b1.alfa = 2 * M_PI - b1.alfa; // Отражение по вертикали
 
         ball = b1;
     }
 }
 
+// Проверяет в прекратил ли дживении мячик
 void ballWork() {
     if (run)
         autoMoveBall();

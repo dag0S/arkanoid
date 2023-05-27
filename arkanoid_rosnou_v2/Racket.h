@@ -31,7 +31,7 @@ void moveRacket(int x) {
 void racketShout() {
     if (racket.fireMode != 1)
         return;
-    objArrAdd(objCreate(racket.x + racket.widthRacket / 2, racket.y - 2, -M_PI_2, 0.5, BULLET));
+    objArrAdd( objCreate(racket.x + racket.widthRacket / 2, racket.y - 2, -M_PI_2, 0.5, BULLET) );
     racket.fireMode += 10;
 }
 

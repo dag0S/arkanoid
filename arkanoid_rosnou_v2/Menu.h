@@ -1,5 +1,3 @@
-char menu;
-
 // пунки меню - Инструкция
 void showInstruction() {
     system("cls");
@@ -19,7 +17,7 @@ void showInstruction() {
         << "\t\t\tQ - quickly\n"
         << "\t\t\tS - slow\n\n";
     cout << "\t\t\tgo back - 4\n";
-    menu = getchar();
+    menu = _getch();
     if (menu == '4') {
         menu = ' ';
         showMenu();
@@ -39,7 +37,7 @@ void showInfo() {
         << "\tgitHub: https://github.com/dag0S/arkanoid.git \n\n";
 
     cout << "\tgo back - 4\n";
-    menu = getchar();
+    menu = _getch();
     if (menu == '4') {
         menu = ' ';
         showMenu();
@@ -57,7 +55,7 @@ void showMenu() {
         << "\t\t\t\t1 Start      \n"
         << "\t\t\t\t2 Instruction\n"
         << "\t\t\t\t3 Info       \n\n";
-    menu = getchar();
+    menu = _getch();
     if (menu == '1')
         return;
     else if (menu == '2') {

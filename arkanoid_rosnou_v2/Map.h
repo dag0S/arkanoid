@@ -6,7 +6,7 @@ void drawBrick(int x, int y) {
 
 // инициализация карты
 void lvlMapPuzzile() {
-    // lvl 1
+    // lvl 1 РОСНОУ
     if (lvl == 1) {
         // Р
         for (int i = 3; i <= 8; i++)
@@ -60,56 +60,8 @@ void lvlMapPuzzile() {
         drawBrick(14, 52);
     }
 
-    // lvl 2
+    // lvl 2 Краб
     if (lvl == 2) {
-        for (int i = 9; i <= 49; i++)
-            lvlMap[15][i] = '3';
-        for (int i = 1; i <= 14; i++) {
-            lvlMap[i][9] = '3';
-            lvlMap[i][49] = '3';
-        }
-        for (int i = 1; i <= 5; i++) {
-            drawBrick(i, 10);
-            drawBrick(i + 9, 10);
-            drawBrick(i, 46);
-            drawBrick(i + 9, 46);
-        }
-        for (int i = 1; i <= 4; i++) {
-            drawBrick(i, 13);
-            drawBrick(i + 10, 13);
-            drawBrick(i, 43);
-            drawBrick(i + 10, 43);
-        }
-        for (int i = 1; i <= 3; i++) {
-            drawBrick(i, 16);
-            drawBrick(i + 11, 16);
-            drawBrick(i, 40);
-            drawBrick(i + 11, 40);
-        }
-        for (int i = 1; i <= 2; i++) {
-            drawBrick(i, 19);
-            drawBrick(i + 12, 19);
-            drawBrick(i, 37);
-            drawBrick(i + 12, 37);
-        }
-        drawBrick(1, 22);
-        drawBrick(14, 22);
-        drawBrick(1, 34);
-        drawBrick(14, 34);
-        for (int i = 6; i <= 9; i++)
-            drawBrick(i, 28);
-        for (int i = 5; i <= 10; i++) {
-            lvlMap[i][27] = '1';
-            lvlMap[i][31] = '1';
-        }
-        for (int i = 28; i <= 30; i++) {
-            lvlMap[5][i] = '1';
-            lvlMap[10][i] = '1';
-        }
-    }
-
-    // lvl 3
-    if (lvl == 3) {
         for (int i = 16; i <= 42; i = i + 6)
             drawBrick(1, i);
         for (int i = 2; i <= 4; i++) {
@@ -157,8 +109,8 @@ void lvlMapPuzzile() {
             lvlMap[9][i] = lvlMap[9][i + 6] = '2';
     }
 
-    // lvl 4
-    if (lvl == 4) {
+    // lvl 3 Ступеньки
+    if (lvl == 3) {
         int k = 0;
         int d = 1;
         for (int i = 2; i <= 19; i++) {
@@ -175,6 +127,54 @@ void lvlMapPuzzile() {
             lvlMap[20][i] = '3';
         drawBrick(20, 55);
         lvlMap[20][58] = '3';
+    }
+
+    // lvl 4 Око саурона
+    if (lvl == 4) {
+        for (int i = 9; i <= 49; i++)
+            lvlMap[15][i] = '3';
+        for (int i = 1; i <= 14; i++) {
+            lvlMap[i][9] = '3';
+            lvlMap[i][49] = '3';
+        }
+        for (int i = 1; i <= 5; i++) {
+            drawBrick(i, 10);
+            drawBrick(i + 9, 10);
+            drawBrick(i, 46);
+            drawBrick(i + 9, 46);
+        }
+        for (int i = 1; i <= 4; i++) {
+            drawBrick(i, 13);
+            drawBrick(i + 10, 13);
+            drawBrick(i, 43);
+            drawBrick(i + 10, 43);
+        }
+        for (int i = 1; i <= 3; i++) {
+            drawBrick(i, 16);
+            drawBrick(i + 11, 16);
+            drawBrick(i, 40);
+            drawBrick(i + 11, 40);
+        }
+        for (int i = 1; i <= 2; i++) {
+            drawBrick(i, 19);
+            drawBrick(i + 12, 19);
+            drawBrick(i, 37);
+            drawBrick(i + 12, 37);
+        }
+        drawBrick(1, 22);
+        drawBrick(14, 22);
+        drawBrick(1, 34);
+        drawBrick(14, 34);
+        for (int i = 6; i <= 9; i++)
+            drawBrick(i, 28);
+        for (int i = 5; i <= 10; i++) {
+            lvlMap[i][27] = '1';
+            lvlMap[i][31] = '1';
+        }
+        for (int i = 28; i <= 30; i++) {
+            lvlMap[5][i] = '1';
+            lvlMap[10][i] = '1';
+        }
     }
 }
 
@@ -198,11 +198,8 @@ void lvlMapPut() {
     mas = lvlMap;
 }
 
-// показ карты и худа
-void show() {
-    setCursor(0, 0);
-
-    // HUD
+// HUD
+void showHUD() {
     cout << endl;
     cout << "+--------------+----------------------+--------------------+" << endl;
     cout << "|    hp " << hp;
@@ -232,6 +229,13 @@ void show() {
     else
         cout << "";
     cout << "  |" << endl << "+--------------+----------------------+--------------------+" << endl << endl;
+}
+
+// показ карты и худа
+void show() {
+    setCursor(0, 0);
+
+    showHUD();
 
     for (int i = 0; i < HEIGHT; i++) {
 
@@ -271,7 +275,7 @@ void show() {
         if (i == 20)
             cout << "\t\t\tS - slow";
 
-        if (i < HEIGHT)
+        if (i < HEIGHT - 1)
             cout << endl;
     }
 }
